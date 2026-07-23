@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum OrderStatus {
+  pending
+  preparing
+  ready
+  paid
+  cancelled
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now())
+
+  foods Food[]
+}
+
+model Food {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  price       Float
+  imageUrl    String?
+  isAvailable Boolean   @default(true)
+  categoryId  Int
+  category    Category  @relation(fields: [categoryId], references: [id])
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  orderItems OrderItem[]
+}
+
+model Table {
+  id        Int      @id @default(autoincrement())
+  number    Int      @unique
+  qrCode    String?
+  createdAt DateTime @default(now())
+
+  orders Order[]
+}
+
+model Order {
+  id         Int         @id @default(autoincrement())
+  tableId    Int
+  table      Table       @relation(fields: [tableId], references: [id])
+  status     OrderStatus @default(pending)
+  total      Float       @default(0)
+  paidAt     DateTime?
+  note       String?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  items OrderItem[]
+}
+
+model OrderItem {
+  id        Int   @id @default(autoincrement())
+  orderId   Int
+  order     Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  foodId    Int
+  food      Food  @relation(fields: [foodId], references: [id])
+  quantity  Int   @default(1)
+  price     Float
+}
+
+model Expense {
+  id          Int      @id @default(autoincrement())
+  amount      Float
+  description String?
+  expenseDate DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model DayClose {
+  id           Int      @id @default(autoincrement())
+  closeDate    DateTime @unique
+  totalRevenue Float
+  totalExpense Float
+  totalProfit  Float
+  orderCount   Int
+  expenseCount Int
+  note         String?
+  closedAt     DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Admin {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
