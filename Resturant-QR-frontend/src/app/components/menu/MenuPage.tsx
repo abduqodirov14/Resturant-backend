@@ -5,11 +5,10 @@ import { resolveImageUrl } from '../../lib/image';
 import { FoodCard } from './FoodCard';
 import { Cart } from './Cart';
 import { Badge } from '../ui/badge';
-import { Card } from '../ui/card';
 import { Input } from '../ui/input';
 import { MenuLoadingSkeleton } from './LoadingSkeleton';
 import { AnimatePresence, motion } from 'motion/react';
-import { QrCode, Search, ShoppingBag, Sparkles, UtensilsCrossed } from 'lucide-react';
+import { Search, ShoppingBag, Sparkles, UtensilsCrossed } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface MenuPageProps {
@@ -100,11 +99,6 @@ export function MenuPage({ tableNumber }: MenuPageProps) {
       return matchesSearch && matchesCategory;
     });
   }, [deferredSearchQuery, foods, selectedCategory]);
-
-  const featuredFoods = useMemo(() => {
-    const availableFoods = foods.filter((food) => food.available !== false);
-    return availableFoods.slice(0, 3);
-  }, [foods]);
 
   const cartTotals = useMemo(() => {
     return cart.reduce(
@@ -347,91 +341,10 @@ export function MenuPage({ tableNumber }: MenuPageProps) {
         ) : (
           <>
             <motion.div
-              className="mb-8 grid gap-6 xl:grid-cols-[1.15fr_0.85fr]"
+              className="mb-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
             >
-              <Card className="overflow-hidden border-0 bg-gradient-to-br from-slate-950 via-slate-900 to-orange-900 p-6 text-white shadow-2xl lg:p-8">
-                <div className="flex flex-wrap items-center gap-3">
-                  <Badge className="border border-white/10 bg-white/10 text-white">
-                    <QrCode className="mr-2 h-4 w-4" />
-                    QR menu flow
-                  </Badge>
-                  <Badge className="border border-emerald-300/20 bg-emerald-400/10 text-emerald-100">
-                    Savat doim ko'rinadi
-                  </Badge>
-                </div>
-
-                <div className="mt-5 max-w-2xl">
-                  <h2 className="text-3xl font-bold leading-tight lg:text-4xl">
-                    Skanerdan keyin ko'rinadigan menyu va tez savat oqimi
-                  </h2>
-                  <p className="mt-3 text-sm leading-6 text-orange-100/80 lg:text-base">
-                    Mijoz menyuni ko'radi, mahsulotni savatga qo'shadi va checkout tugmasi
-                    mobil qurilmada ham doim ko'rinib turadi.
-                  </p>
-                </div>
-
-                <div className="mt-6 grid gap-3 sm:grid-cols-3">
-                  <div className="rounded-2xl border border-white/10 bg-white/8 p-4">
-                    <p className="text-sm text-orange-100/70">Menyudagi taom</p>
-                    <p className="mt-2 text-2xl font-bold">{foods.length}</p>
-                  </div>
-                  <div className="rounded-2xl border border-white/10 bg-white/8 p-4">
-                    <p className="text-sm text-orange-100/70">Kategoriya</p>
-                    <p className="mt-2 text-2xl font-bold">{Math.max(categories.length - 1, 0)}</p>
-                  </div>
-                  <div className="rounded-2xl border border-white/10 bg-white/8 p-4">
-                    <p className="text-sm text-orange-100/70">Savat holati</p>
-                    <p className="mt-2 text-2xl font-bold">{cartTotals.items} ta</p>
-                  </div>
-                </div>
-              </Card>
-
-              <div className="grid gap-4 sm:grid-cols-3 xl:grid-cols-1">
-                {featuredFoods.map((food, index) => (
-                  <motion.div
-                    key={food.id}
-                    initial={{ opacity: 0, x: 18 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.08 }}
-                  >
-                    <Card className="overflow-hidden border-0 bg-white shadow-xl">
-                      <div className="grid grid-cols-[120px_1fr]">
-                        <img
-                          src={food.image}
-                          alt={food.nameUz || food.name}
-                          className="h-full min-h-[126px] w-full object-cover"
-                          loading={index === 0 ? 'eager' : 'lazy'}
-                          decoding="async"
-                        />
-                        <div className="space-y-2 p-4">
-                          <Badge variant="outline" className="border-orange-200 text-orange-700">
-                            {food.categoryUz || 'Menu'}
-                          </Badge>
-                          <p className="text-lg font-bold text-slate-900">{food.nameUz || food.name}</p>
-                          <p className="line-clamp-2 text-sm text-slate-500">
-                            {food.descriptionUz || food.description}
-                          </p>
-                          <div className="flex items-center justify-between pt-1">
-                            <span className="font-bold text-orange-600">
-                              {food.price.toLocaleString()} so'm
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() => handleAddToCart(food)}
-                              className="rounded-full bg-slate-950 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-slate-800"
-                            >
-                              Savatga
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </Card>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
 
             {filteredFoods.length === 0 ? (
               <motion.div
